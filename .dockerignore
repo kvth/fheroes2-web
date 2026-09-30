@@ -1,0 +1,2 @@
+# the sources are cloned inside the container, nothing from here is needed in the build context
+*

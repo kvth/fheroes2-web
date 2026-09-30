@@ -1,2 +1,44 @@
 # fheroes2-wasm-build
-Helper scripts to build official fheroes2 with the official emscripten support
+
+Helper scripts to build official [fheroes2](https://github.com/ihhub/fheroes2) with its built-in Emscripten
+(WebAssembly) support, using podman, and host it via GitHub Pages. Only podman and git are needed on the host.
+
+## Usage
+
+```sh
+./build_emscripten.sh                      # the pinned default commit (5affbfbba6bcc38eedbfa91cc0e4494cda2c3eb3)
+./build_emscripten.sh -r master            # latest commit of master
+./build_emscripten.sh -r 1.1.17            # a tag
+./build_emscripten.sh -r some-branch       # a branch
+./build_emscripten.sh -r <40-char-hash>    # a specific commit
+./build_emscripten.sh --help               # all options
+```
+
+The ref is resolved to a commit hash before building, so a new commit on a branch always triggers a rebuild,
+while rebuilding the same commit is served from the podman cache.
+Upstream Emscripten support (`Makefile.emscripten`) exists since release 1.1.6, older refs cannot be built.
+
+The result replaces the contents of `docs/` (override with `-o DIR`): `fheroes2.{js,wasm,data}`, the stock
+launcher (`index.html`), license, readme and a `COMMIT` file with the built commit hash.
+
+## Hosting
+
+**GitHub Pages:** commit and push `docs/`, then in the repository settings under *Pages* choose
+*Deploy from a branch*, branch `main`, folder `/docs`.
+
+**Locally:**
+
+```sh
+python3 -m http.server 8080 --directory docs
+```
+
+The original game data is not included; the stock launcher asks you to pick your game directory in the browser.
+It must contain `data/` (`HEROES2.AGG`, `HEROES2X.AGG`) and optionally `maps/` and `music/`.
+
+Multithreaded builds (`-t`) need the following headers, which GitHub Pages and `http.server` do not send,
+so use the default single-threaded build there:
+
+```text
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Embedder-Policy: require-corp
+```
