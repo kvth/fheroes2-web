@@ -35,6 +35,20 @@ python3 -m http.server 8080 --directory docs
 The original game data is not included; the stock launcher asks you to pick your game directory in the browser.
 It must contain `data/` (`HEROES2.AGG`, `HEROES2X.AGG`) and optionally `maps/` and `music/`.
 
+## Save games
+
+Saves only live in the browser (IndexedDB). The build adds two buttons to the stock launcher
+(from [launcher/savegames.js](launcher/savegames.js)):
+
+* **Export saves** downloads all save games as `fheroes2-saves-<date>.zip`
+* **Import saves** accepts such zip files (or any zip containing save files) and single `.sav`, `.savc`, `.savh`
+  and `.savm` files, asking before overwriting existing saves
+
+The save files are regular fheroes2 save games. The buttons are only available on the launcher screen,
+so reload the page after saving in-game to export the new saves.
+
+## Multithreading
+
 Multithreaded builds (`-t`) need the following headers, which GitHub Pages and `http.server` do not send,
 so use the default single-threaded build there:
 
