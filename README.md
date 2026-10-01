@@ -2,14 +2,27 @@
 
 **Play it in your browser: <https://kvth.github.io/fheroes2-web/>**
 
-![The launcher, with the demo installed](screenshots/launcher.webp)
+[![The launcher, with the demo installed](screenshots/launcher.webp)](https://kvth.github.io/fheroes2-web/)
 
-![The main menu of fheroes2 running in the browser](screenshots/main-menu.webp)
+## Features
+
+Compared to the standard launcher of the fheroes2 web version:
+
+* **Free demo:** no copy of the game? Download the official demo from the start page and load it with one more click.
+* **Easier setup:** pick your Heroes II folder or a zip of it. Works without the Price of Loyalty expansion too.
+* **See what is installed:** the start page shows your game version, the number of maps and whether music is there.
+* **Saved games on the start page:** see all your saves, delete the ones you no longer need.
+* **Export and import saves:** download all saves as one zip file, for a backup or to continue on another
+  browser or computer, and import them there.
+* **Quit returns to the start page:** quitting the game brings you back, ready to play again.
+* **Change or remove the game files** at any time, your saved games are kept.
+* **Loading progress** while the game downloads.
+* **New look:** a redesigned start page in the style of the game, which also works on small screens.
+
+## Building
 
 Helper scripts to build official [fheroes2](https://github.com/ihhub/fheroes2) with its built-in Emscripten
 (WebAssembly) support, using podman, and host it via GitHub Pages. Only podman and git are needed on the host.
-
-## Usage
 
 ```sh
 ./build.sh                   # the pinned default commit (5affbfbba6bcc38eedbfa91cc0e4494cda2c3eb3)
