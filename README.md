@@ -1,4 +1,10 @@
-# fheroes2-wasm-build
+# fheroes2-web
+
+**Play it in your browser: <https://kvth.github.io/fheroes2-web/>**
+
+![The launcher, with the demo installed](screenshots/launcher.webp)
+
+![The main menu of fheroes2 running in the browser](screenshots/main-menu.webp)
 
 Helper scripts to build official [fheroes2](https://github.com/ihhub/fheroes2) with its built-in Emscripten
 (WebAssembly) support, using podman, and host it via GitHub Pages. Only podman and git are needed on the host.
@@ -6,20 +12,20 @@ Helper scripts to build official [fheroes2](https://github.com/ihhub/fheroes2) w
 ## Usage
 
 ```sh
-./build_emscripten.sh                      # the pinned default commit (5affbfbba6bcc38eedbfa91cc0e4494cda2c3eb3)
-./build_emscripten.sh -r master            # latest commit of master
-./build_emscripten.sh -r 1.1.17            # a tag
-./build_emscripten.sh -r some-branch       # a branch
-./build_emscripten.sh -r <40-char-hash>    # a specific commit
-./build_emscripten.sh --help               # all options
+./build.sh                   # the pinned default commit (5affbfbba6bcc38eedbfa91cc0e4494cda2c3eb3)
+./build.sh -r master         # latest commit of master
+./build.sh -r 1.1.17         # a tag
+./build.sh -r some-branch    # a branch
+./build.sh -r <40-char-hash> # a specific commit
+./build.sh --help            # all options
 ```
 
 The ref is resolved to a commit hash before building, so a new commit on a branch always triggers a rebuild,
 while rebuilding the same commit is served from the podman cache.
 Upstream Emscripten support (`Makefile.emscripten`) exists since release 1.1.6, older refs cannot be built.
 
-The result replaces the contents of `docs/` (override with `-o DIR`): `fheroes2.{js,wasm,data}`, the stock
-launcher (`index.html`), license, readme and a `COMMIT` file with the built commit hash.
+The result replaces the contents of `docs/` (override with `-o DIR`): the launcher (`index.html`, `assets/`),
+`fheroes2.{js,wasm,data}`, license, readme and a `COMMIT` file with the built commit hash.
 
 ## Hosting
 
@@ -32,25 +38,29 @@ launcher (`index.html`), license, readme and a `COMMIT` file with the built comm
 ./serve.sh              # http://127.0.0.1:8888/, or: ./serve.sh 0.0.0.0 8080
 ```
 
-The original game data is not included; the stock launcher asks you to pick your game directory in the browser.
-It must contain `data/` (`HEROES2.AGG`, `HEROES2X.AGG`) and optionally `maps/` and `music/`.
+## Launcher
 
-Without the original game, the launcher offers the free demo instead (the browser version of upstream's
-`script/demo` scripts, see [launcher/demo.js](launcher/demo.js)): download `h2demo.zip` via the link
-(archive.org does not allow downloading it from the page directly), then load it with
-*Load the downloaded h2demo.zip*. The archive is checked against its SHA-256, unpacked and the game starts.
+Instead of upstream's stock launcher, the build uses its own one from [web/](web) (Vue + TypeScript + Vite,
+type-checked and built in a Node container as part of the podman build). It talks to the engine only through
+what the Emscripten build exposes (`Module.canvas`, `Module.preRun`, `Module.setStatus` and the `FS`/`ENV`
+globals), see [web/src/lib/engine.ts](web/src/lib/engine.ts).
 
-## Save games
+* **Game files:** the original game data is not included. Select your Heroes of Might and Magic II folder
+  (it must contain `DATA/HEROES2.AGG`; `MAPS`, `MUSIC` and `ANIM` are copied too) or a zip of it.
+  Without the game, download the free demo `h2demo.zip` via the link (the browser version of upstream's
+  `script/demo` scripts; archive.org does not allow downloading it from the page directly) and load it.
+* **Saved games** are listed on the launcher, can be deleted, exported as `fheroes2-saves-<date>.zip` and
+  imported from such zip files or single `.sav`, `.savc`, `.savh` and `.savm` files.
 
-Saves only live in the browser (IndexedDB). The build adds two buttons to the stock launcher
-(from [launcher/savegames.js](launcher/savegames.js), zip handling in [launcher/zip.js](launcher/zip.js)):
+Game files and saves are stored in the browser (IndexedDB), nothing is uploaded. Quitting the game
+returns to the launcher.
 
-* **Export saves** downloads all save games as `fheroes2-saves-<date>.zip`
-* **Import saves** accepts such zip files (or any zip containing save files) and single `.sav`, `.savc`, `.savh`
-  and `.savm` files, asking before overwriting existing saves
+To work on the launcher with live reload against an existing build in `docs/` (no Node needed on the host):
 
-The save files are regular fheroes2 save games. The buttons are only available on the launcher screen,
-so reload the page after saving in-game to export the new saves.
+```sh
+podman run --rm -it --userns=keep-id -v ./web:/web:Z -v ./docs:/docs:ro,Z -w /web -p 5173:5173 \
+    -e FHEROES2_BUILD_DIR=/docs docker.io/library/node:24-alpine sh -c 'npm ci && npm run dev -- --host'
+```
 
 ## Multithreading
 

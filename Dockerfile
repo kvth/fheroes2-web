@@ -16,7 +16,7 @@ RUN echo "int main() { return 0; }" > /tmp/noop.cpp && \
     rm -f /tmp/noop.*
 
 # fetch the sources; FHEROES2_REF may be a branch, tag or full commit hash
-# (build_emscripten.sh resolves it to a commit hash so the layer cache is invalidated on new commits)
+# (build.sh resolves it to a commit hash so the layer cache is invalidated on new commits)
 ARG FHEROES2_REPO=https://github.com/ihhub/fheroes2.git
 ARG FHEROES2_REF=5affbfbba6bcc38eedbfa91cc0e4494cda2c3eb3
 WORKDIR /src
@@ -37,18 +37,21 @@ RUN set -e; \
     done; \
     emmake make -f Makefile.emscripten -j"$(nproc)"
 
-# collect the files needed to host the game (translations, H2D files and FH2M maps are already bundled into fheroes2.data);
-# .nojekyll stops GitHub Pages from running Jekyll on the output
+# collect the engine files (translations, H2D files and FH2M maps are already bundled into fheroes2.data);
+# the stock launcher (files/emscripten/index.html) is replaced by our own one, see the web stage below
 RUN mkdir -p /out && \
-    cp LICENSE changelog.txt docs/README.txt fheroes2.data fheroes2.js fheroes2.wasm* files/emscripten/* /out/ && \
-    git rev-parse HEAD > /out/COMMIT && \
-    touch /out/.nojekyll
+    cp LICENSE changelog.txt docs/README.txt fheroes2.data fheroes2.js fheroes2.wasm* files/emscripten/fheroes2.jpeg /out/ && \
+    git rev-parse HEAD > /out/COMMIT
 
-# add the launcher additions: export/import of save games and loading the demo (see launcher/)
-COPY launcher/zip.js launcher/savegames.js launcher/demo.js /out/
-RUN grep -q '</body>' /out/index.html && \
-    sed -i 's#</body>#<script src="./zip.js"></script>\n<script src="./savegames.js"></script>\n<script src="./demo.js"></script>\n</body>#' /out/index.html
+# build the launcher (web/, a Vue + Vite app; web/public/.nojekyll stops GitHub Pages from running Jekyll)
+FROM docker.io/library/node:24-alpine AS web
+WORKDIR /web
+COPY web/package.json web/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY web/ ./
+RUN npm run build
 
 # only the build results, export them with: podman build --target out --output type=local,dest=<dir> .
 FROM scratch AS out
 COPY --from=build /out/ /
+COPY --from=web /web/dist/ /

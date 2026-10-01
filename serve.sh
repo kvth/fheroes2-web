@@ -8,7 +8,7 @@ port="${2:-8888}"
 docs="$(dirname "$(realpath "$0")")/docs"
 
 if [[ ! -f "$docs/index.html" ]]; then
-    echo "error: $docs/index.html not found, run ./build_emscripten.sh first" >&2
+    echo "error: $docs/index.html not found, run ./build.sh first" >&2
     exit 1
 fi
 

@@ -1,0 +1,177 @@
+:root {
+    --bg: #0d0a06;
+    --panel: rgba(24, 18, 10, 0.94);
+    --card: #211809;
+    --border: #5c4519;
+    --border-soft: #3a2c12;
+    --gold: #f2c14e;
+    --gold-light: #f8d97f;
+    --gold-dark: #c8962e;
+    --text: #efe6d2;
+    --muted: #a8987a;
+    --danger: #e98b74;
+    --ok: #a9d08a;
+    --heading: Georgia, 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+
+    color-scheme: dark;
+    font: 16px/1.55 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    color: var(--text);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+        radial-gradient(ellipse 80% 50% at 50% 0%, rgba(242, 193, 78, 0.16), transparent 70%),
+        radial-gradient(ellipse at 50% 120%, #2a1d0b, transparent 60%),
+        var(--bg);
+    background-attachment: fixed;
+}
+
+body.playing {
+    overflow: hidden;
+    background: #000;
+}
+
+h1, h2, h3 {
+    font-family: var(--heading);
+    font-weight: 600;
+    color: var(--gold);
+    margin: 0;
+    line-height: 1.25;
+}
+
+a {
+    color: var(--gold);
+}
+
+a:hover {
+    color: var(--gold-light);
+}
+
+p {
+    margin: 0;
+}
+
+/* game canvas: full screen, only visible while the game runs (the engine needs the id "canvas") */
+#canvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    display: block;
+    visibility: hidden;
+}
+
+#canvas.visible {
+    visibility: visible;
+}
+
+/* buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font: inherit;
+    font-weight: 600;
+    padding: 9px 18px;
+    border-radius: 8px;
+    border: 1px solid var(--gold-dark);
+    background: rgba(242, 193, 78, 0.04);
+    color: var(--gold);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.btn:hover:not(:disabled) {
+    background: rgba(242, 193, 78, 0.12);
+    border-color: var(--gold);
+    color: var(--gold-light);
+}
+
+.btn:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+.btn:focus-visible {
+    outline: 2px solid var(--gold-light);
+    outline-offset: 2px;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.btn-primary {
+    background: linear-gradient(180deg, var(--gold-light), var(--gold-dark));
+    border-color: var(--gold-light);
+    color: #2a1c05;
+    box-shadow: 0 4px 18px rgba(242, 193, 78, 0.25);
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: linear-gradient(180deg, #fbe39a, var(--gold));
+    color: #2a1c05;
+}
+
+.btn-large {
+    font-family: var(--heading);
+    font-size: 1.35rem;
+    padding: 12px 48px;
+}
+
+.btn-small {
+    font-size: 0.875rem;
+    padding: 5px 12px;
+}
+
+.btn-danger {
+    border-color: #7a3527;
+    color: var(--danger);
+    background: transparent;
+}
+
+.btn-danger:hover:not(:disabled) {
+    border-color: var(--danger);
+    color: #f4a996;
+    background: rgba(233, 139, 116, 0.08);
+}
+
+/* messages */
+.notice {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid;
+    font-size: 0.95rem;
+}
+
+.notice.error {
+    color: var(--danger);
+    border-color: #6b2e22;
+    background: rgba(233, 139, 116, 0.08);
+}
+
+.notice.success {
+    color: var(--ok);
+    border-color: #3d5a2a;
+    background: rgba(169, 208, 138, 0.08);
+}
+
+.muted {
+    color: var(--muted);
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+}

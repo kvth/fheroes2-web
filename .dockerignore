@@ -1,3 +1,5 @@
-# the sources are cloned inside the container, only the launcher additions are needed from here
+# the sources are cloned inside the container, only the launcher (web/) is needed from here
 *
-!launcher/
+!web/
+web/node_modules/
+web/dist/
