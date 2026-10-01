@@ -44,10 +44,10 @@ RUN mkdir -p /out && \
     git rev-parse HEAD > /out/COMMIT && \
     touch /out/.nojekyll
 
-# add export/import of save games to the stock launcher (see launcher/savegames.js)
-COPY launcher/savegames.js /out/
+# add the launcher additions: export/import of save games and loading the demo (see launcher/)
+COPY launcher/zip.js launcher/savegames.js launcher/demo.js /out/
 RUN grep -q '</body>' /out/index.html && \
-    sed -i 's#</body>#<script src="./savegames.js"></script>\n</body>#' /out/index.html
+    sed -i 's#</body>#<script src="./zip.js"></script>\n<script src="./savegames.js"></script>\n<script src="./demo.js"></script>\n</body>#' /out/index.html
 
 # only the build results, export them with: podman build --target out --output type=local,dest=<dir> .
 FROM scratch AS out
